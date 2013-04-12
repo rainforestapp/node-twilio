@@ -5,7 +5,7 @@
     "author": "Stephen Walters (http://github.com/sjwalter)",
     "repository": {
         "type": "git",
-        "url": "https://github.com/sjwalter/node-twilio.git"
+        "url": "https://github.com/rainforestapp/node-twilio.git"
     },
     "dependencies": {
         "express": ">= 2.0.0"
