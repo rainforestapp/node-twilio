@@ -7,15 +7,15 @@ A Node.js Twilio helper library.
 Parts of node-twilio depend on [`express`](http://expressjs.com).
 
 To install via npm:
-    
+
     npm install twilio
 
 To install by hand, download the module and create a symlink in `~/.node_libraries`
 
     $ ln -s /path/to/node-twilio ~/.node-libraries/twilio
 
-Note: Previously, the npm package named `twilio` referred to 
-[Aaron Blohowiak's Twilio helper library](http://github.com/aaronblohowiak/Twilio-Node). 
+Note: Previously, the npm package named `twilio` referred to
+[Aaron Blohowiak's Twilio helper library](http://github.com/aaronblohowiak/Twilio-Node).
 Due to Aaron's time constraints, he has let this package use the `twilio` name while he is
 unable to work on that implementation.
 
@@ -43,7 +43,9 @@ In order to explain how great this is, I will use an example:
 
 If you were to build a Twilio application in any language using any helper library other than this one, you'd wind up doing something like:
 
+```javascript
 Twilio.makeOutgoingCall(toNumber, fromNumber, UriForCallback);
+```
 
 Then, you'd have to go out and ensure than UriForCallback is a real, provisioned URI, and you'd put either a script or a static Twiml file there, and Twilio would go and fetch it.
 
@@ -53,68 +55,74 @@ First, we want to instantiate a new Twilo client object.
 The constructor takes three parameters: the account SID and auth token, as well as
 the hostname of the application server. (This is used to construct URIs to give Twilio.)
 
-    var sys = require('sys'),
-        TwilioClient = require('twilio').Client,
-        client = new TwilioClient(ACCOUNT_SID, AUTH_TOKEN, MY_HOSTNAME);
+```javascript
+var util = require('util')
+    TwilioClient = require('twilio').Client,
+    client = new TwilioClient(ACCOUNT_SID, AUTH_TOKEN, MY_HOSTNAME);
+```
 
-Now that we have our client, let's get a PhoneNumber object using one of the 
+Now that we have our client, let's get a PhoneNumber object using one of the
 phone numbers that we've provisioned through some other channel.
 (Note: You can provision phone numbers very simply via the Low-Level REST API)
 The phone number used here can be any sort of Twilio number. If it's an outgoing
 caller ID, the object will only be able to make outgoing phone calls/SMS. If it's
 a regular incoming number, it will be able to make/receive phone calls and SMS.
 
-    var phone = client.getPhoneNumber('+16269239971');
+```javascript
+var phone = client.getPhoneNumber('+16269239971');
+```
 
 We'll now setup our phone number. This goes out and requests the phone number
 instance resource and fills in a data structure with this phone number's details.
 
-    phone.setup(function() {
-        
-        // Alright, our phone number is set up. Let's, say, make a call:
-        phone.makeCall('+18674451795', null, function(call) {
-            
-            // 'call' is an OutgoingCall object. This object is an event emitter.
-            // It emits two events: 'answered' and 'ended'
-            call.on('answered', function(reqParams, res) {
-                
-                // reqParams is the body of the request Twilio makes on call pickup.
-                // For instance, reqParams.CallSid, reqParams.CallStatus.
-                // See: http://www.twilio.com/docs/api/2010-04-01/twiml/twilio_request
-                // res is a Twiml.Response object. This object handles generating
-                // a compliant Twiml response.
-                
-                console.log('Call answered');
-    
-                // We'll append a single Say object to the response:
-                res.append(new Twiml.Say('Hello, there!'));
-    
-                // And now we'll send it.
-                res.send();
-            });
-            
-            call.on('ended', function(reqParams) {
-                console.log('Call ended');
-            });
-        });
-    
-        // But wait! What if our number receives an incoming SMS?
-        phone.on('incomingSms', function(reqParams, res) {
-            
-            // As above, reqParams contains the Twilio request parameters.
-            // Res is a Twiml.Response object.
-            
-            console.log('Received incoming SMS with text: ' + reqParams.Body);
-            console.log('From: ' + reqParams.From);
-        });
-    
-        // Oh, and what if we get an incoming call?
-        phone.on('incomingCall', function(reqParams, res) {
-            
-            res.append(new Twiml.Say('Thanks for calling! I think you are beautiful!'));
+```javascript
+phone.setup(function() {
+
+    // Alright, our phone number is set up. Let's, say, make a call:
+    phone.makeCall('+18674451795', null, function(call) {
+
+        // 'call' is an OutgoingCall object. This object is an event emitter.
+        // It emits two events: 'answered' and 'ended'
+        call.on('answered', function(reqParams, res) {
+
+            // reqParams is the body of the request Twilio makes on call pickup.
+            // For instance, reqParams.CallSid, reqParams.CallStatus.
+            // See: http://www.twilio.com/docs/api/2010-04-01/twiml/twilio_request
+            // res is a Twiml.Response object. This object handles generating
+            // a compliant Twiml response.
+
+            console.log('Call answered');
+
+            // We'll append a single Say object to the response:
+            res.append(new Twiml.Say('Hello, there!'));
+
+            // And now we'll send it.
             res.send();
         });
+
+        call.on('ended', function(reqParams) {
+            console.log('Call ended');
+        });
     });
+
+    // But wait! What if our number receives an incoming SMS?
+    phone.on('incomingSms', function(reqParams, res) {
+
+        // As above, reqParams contains the Twilio request parameters.
+        // Res is a Twiml.Response object.
+
+        console.log('Received incoming SMS with text: ' + reqParams.Body);
+        console.log('From: ' + reqParams.From);
+    });
+
+    // Oh, and what if we get an incoming call?
+    phone.on('incomingCall', function(reqParams, res) {
+
+        res.append(new Twiml.Say('Thanks for calling! I think you are beautiful!'));
+        res.send();
+    });
+});
+```
 
 To get going beyond the basics, check out [the documentation](https://github.com/sjwalter/node-twilio/wiki).
 
