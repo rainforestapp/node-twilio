@@ -126,10 +126,6 @@ phone.setup(function() {
 
 To get going beyond the basics, check out [the documentation](https://github.com/sjwalter/node-twilio/wiki).
 
-#### Notes
-
-More documentation is forthcoming.
-
 # License (MIT License)
 
 Copyright (c) 2010 Stephen J. Walters <stephenwalters@gmail.com>
